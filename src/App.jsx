@@ -162,8 +162,7 @@ const callClaude = async (systemPrompt, userPrompt, maxTokens = 2000, onChunk = 
       method: "POST",
       signal: ctrl.signal,
       headers: { 
-        "Content-Type": "application/json",
-        "anthropic-version": "2023-06-01"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
@@ -175,8 +174,9 @@ const callClaude = async (systemPrompt, userPrompt, maxTokens = 2000, onChunk = 
     });
 
     if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.error?.message || "API request failed");
+      let msg = `API error ${res.status}`;
+      try { const e = await res.json(); msg = e.error?.message || msg; } catch {}
+      throw new Error(msg);
     }
 
     const reader = res.body.getReader();
